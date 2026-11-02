@@ -3,7 +3,37 @@
 Registro das decisões tomadas de forma autônoma durante a construção do MVP, conforme
 pedido ("decida e registre no STATUS.md", sem pedir confirmação a cada etapa).
 
-## Resultado da validação (sem Docker)
+## Revalidação — 2026-11-01
+
+Nova sessão: diagnóstico completo (README, STATUS, schema, `git branch -a`, `git log`,
+`git status`) confirmou que não existe branch `v2` (só `master`, árvore limpa) e que o
+MVP descrito abaixo já cobre 100% do escopo pedido do "Inglês na Prática" — landing com
+WhatsApp, isca em PDF com leads em CSV, os dois cursos publicados com preços
+97/97/60/200 em BRL, vocabulário com áudio, flashcards, os três tipos de exercício,
+progresso/sequência/certificado, agendamento SP/NY avulso e pacote de 4, depoimentos,
+painéis de professor/admin e LGPD (exportação/exclusão de conta) — todos confirmados por
+leitura de código, não só pelo registro abaixo. Como não havia nada pendente no working
+tree, nenhum commit de "pendências" foi necessário nesta etapa.
+
+Revalidação completa executada de novo (Postgres embarcado, porta 5434, iniciado
+destacado e aguardado via polling síncrono de porta/conexão real com
+`.devtools/wait-port.mjs` e `.devtools/check-pg.mjs`, **parado ao final**):
+
+| Etapa | Comando | Resultado |
+|---|---|---|
+| Migração | `npx prisma migrate deploy` | ✅ já aplicada, nada pendente |
+| Seed | `npm run db:seed` | ✅ concluído (idempotente) |
+| Typecheck | `npm run typecheck` | ✅ sem erros |
+| Lint | `npm run lint` | ✅ 0 erros (1 warning benigno de `exhaustive-deps`, mesmo de antes) |
+| Testes | `npm run test` | ✅ 17/17 (vitest) |
+| Build | `npm run build` | ✅ build de produção (standalone) gerado, 47 rotas |
+
+Nenhuma variável de ambiente nova foi necessária. Nenhuma migration nova foi criada (o
+schema não mudou). Próximo passo de deploy: seguir a seção "Deploy (Docker)" do
+`README.md` — ainda não executado nesta máquina (requer Postgres/MinIO reais e segredos
+de produção, incluindo chaves Stripe reais em vez dos placeholders do `.env`).
+
+## Resultado da validação original (sem Docker)
 
 Executado nesta máquina com Postgres embarcado (`embedded-postgres`) em
 `.devtools/pg` (dados em `.devtools/data`), porta **5434**, iniciado destacado e
