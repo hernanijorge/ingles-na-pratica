@@ -24,7 +24,7 @@ export const courseInput = z.object({
   slug: z.string().min(1).regex(/^[a-z0-9-]+$/, "Use apenas letras minúsculas, números e hífens."),
   description: z.string().min(1),
   level: z.string().default("Iniciante"),
-  productKey: z.enum(["COURSE_FULL", "COURSE_CONSTRUCTION", "SINGLE_CLASS", "PACKAGE_4"]),
+  productKey: z.enum(["COURSE_FULL", "COURSE_CONSTRUCTION", "SINGLE_CLASS", "PACKAGE_4"]).optional(),
   published: z.boolean().default(false),
   order: z.number().int().default(0),
 });

@@ -108,7 +108,7 @@ model Course {
   level       String   @default("Iniciante")
   published   Boolean  @default(false)
   order       Int      @default(0)
-  productKey  ProductKey
+  productKey  ProductKey?
   teacherId   String?
   teacher     User?    @relation("CourseTeacher", fields: [teacherId], references: [id])
   createdAt   DateTime @default(now())

@@ -82,7 +82,7 @@ export default async function LandingPage() {
               <p className="mt-3 text-sm text-brand-gray">{course.lessons.length} aulas · {course.level}</p>
               <div className="mt-4 flex items-center justify-between">
                 <span className="font-heading text-xl font-bold text-brand-blue-dark">
-                  {formatBRL(priceByKey.get(course.productKey) ?? 9700)}
+                  {formatBRL((course.productKey && priceByKey.get(course.productKey)) ?? 9700)}
                 </span>
                 <Link
                   href={`/cursos/${course.slug}`}

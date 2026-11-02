@@ -15,7 +15,9 @@ export default async function CourseLandingPage({ params }: { params: Promise<{ 
   if (!course) notFound();
 
   const { session, isEnrolled } = await getViewerCourseAccess(course.id);
-  const product = await prisma.product.findUnique({ where: { key: course.productKey } });
+  const product = course.productKey
+    ? await prisma.product.findUnique({ where: { key: course.productKey } })
+    : null;
 
   return (
     <main className="min-h-screen bg-white">
@@ -39,7 +41,7 @@ export default async function CourseLandingPage({ params }: { params: Promise<{ 
 
         {!isEnrolled && product && (
           <div className="mt-6">
-            <BuyCourseButton productKey={course.productKey} priceCents={product.priceCents} loggedIn={Boolean(session)} />
+            <BuyCourseButton productKey={product.key} priceCents={product.priceCents} loggedIn={Boolean(session)} />
           </div>
         )}
 
