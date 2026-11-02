@@ -262,13 +262,14 @@ model ClassCredit {
 }
 
 model AvailabilitySlot {
-  id         String   @id @default(cuid())
-  teacherId  String
-  teacher    User     @relation(fields: [teacherId], references: [id], onDelete: Cascade)
-  startsAt   DateTime
-  endsAt     DateTime
-  isBooked   Boolean  @default(false)
-  createdAt  DateTime @default(now())
+  id          String   @id @default(cuid())
+  teacherId   String
+  teacher     User     @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  startsAt    DateTime
+  endsAt      DateTime
+  isBooked    Boolean  @default(false)
+  meetingLink String?
+  createdAt   DateTime @default(now())
 
   booking Booking?
 }

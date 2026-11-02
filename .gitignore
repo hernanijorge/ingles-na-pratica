@@ -25,6 +25,7 @@ Thumbs.db
 # testing / local tooling
 .devtools/
 coverage/
+*.tsbuildinfo
 
 # prisma
 prisma/dev.db
