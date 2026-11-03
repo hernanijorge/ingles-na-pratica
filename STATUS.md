@@ -3,6 +3,23 @@
 Registro das decisões tomadas de forma autônoma durante a construção do MVP, conforme
 pedido ("decida e registre no STATUS.md", sem pedir confirmação a cada etapa).
 
+## Deploy em produção — 2026-11-03
+
+App publicado no Easypanel (projeto `nyt`, serviços `ingles-db`/`ingles-minio`/`ingles-app`).
+Detalhes completos (pipeline de build, variáveis de ambiente, bugs encontrados e
+corrigidos, checklist de validação manual, pendências) em [`docs/DEPLOY.md`](docs/DEPLOY.md).
+
+Resumo: build fora da VPS via GitHub Actions + GHCR (evita o pico de memória do `next
+build` numa VPS compartilhada), swap de 2 GB configurado no servidor, limites de memória
+por serviço (256/320/512 MB). Conteúdo semeado via `prisma/seed-content.ts` (novo —
+idempotente, nunca cria usuários). Quatro bugs reais de produção encontrados e corrigidos
+durante o primeiro deploy (build sem `DATABASE_URL`, pré-renderização estática da
+landing, arquivo wasm do Prisma faltando na imagem, client do Prisma não cacheando em
+produção). Fluxo principal validado manualmente em produção: landing, isca com PDF, lead
+salvo, cadastro com LGPD, aula grátis com exercícios. Pendente: Stripe/WhatsApp reais,
+domínio próprio, teste manual da gravação de áudio e do login do admin real, CORS do
+MinIO.
+
 ## Revalidação — 2026-11-01
 
 Nova sessão: diagnóstico completo (README, STATUS, schema, `git branch -a`, `git log`,
