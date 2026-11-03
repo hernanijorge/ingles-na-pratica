@@ -13,10 +13,6 @@ function formatBRL(cents: number) {
 }
 
 export default async function LandingPage() {
-  const courseCountDebug = await prisma.course.count();
-  const coursePublishedCountDebug = await prisma.course.count({ where: { published: true } });
-  console.log("[debug] course.count()=", courseCountDebug, "published=", coursePublishedCountDebug);
-
   const [courses, products, testimonials] = await Promise.all([
     prisma.course.findMany({
       where: { published: true },
@@ -31,7 +27,6 @@ export default async function LandingPage() {
       take: 6,
     }),
   ]);
-  console.log("[debug] findMany courses.length=", courses.length, "products.length=", products.length);
 
   const priceByKey = new Map(products.map((p) => [p.key, p.priceCents]));
 
