@@ -19,9 +19,18 @@ function createPrismaClient() {
 // importação do módulo -- o `next build` importa toda rota (inclusive as
 // que nunca rodam, como /api/account/delete) pra coletar dados de página,
 // e isso não deve exigir DATABASE_URL em build-time.
+//
+// Cacheia sempre (closure, não só globalThis em dev) -- sem isso, em
+// produção cada acesso a uma propriedade do Proxy (prisma.course,
+// prisma.product, ...) criava um PrismaClient/pool de conexão NOVO, inclusive
+// quando chamados em paralelo via Promise.all.
+let cachedClient: PrismaClient | undefined;
+
 function getPrisma(): PrismaClient {
   if (globalThis.__prisma) return globalThis.__prisma;
+  if (cachedClient) return cachedClient;
   const client = createPrismaClient();
+  cachedClient = client;
   if (process.env.NODE_ENV !== "production") {
     globalThis.__prisma = client;
   }
