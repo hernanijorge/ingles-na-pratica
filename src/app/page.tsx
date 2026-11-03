@@ -3,6 +3,11 @@ import { prisma } from "@/lib/prisma";
 import { Logo } from "@/components/Logo";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 
+// Cursos, preços e depoimentos são editáveis pelo admin -- a landing não
+// pode ficar presa a um snapshot gerado no build. Também evita que o build
+// (sem banco acessível, ex. CI) quebre tentando pré-renderizar esta página.
+export const dynamic = "force-dynamic";
+
 function formatBRL(cents: number) {
   return (cents / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
