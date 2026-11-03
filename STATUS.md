@@ -17,8 +17,23 @@ durante o primeiro deploy (build sem `DATABASE_URL`, pré-renderização estáti
 landing, arquivo wasm do Prisma faltando na imagem, client do Prisma não cacheando em
 produção). Fluxo principal validado manualmente em produção: landing, isca com PDF, lead
 salvo, cadastro com LGPD, aula grátis com exercícios. Pendente: Stripe/WhatsApp reais,
-domínio próprio, teste manual da gravação de áudio e do login do admin real, CORS do
-MinIO.
+domínio próprio, teste manual da gravação de áudio e do login do admin real.
+
+### Ajustes pós-deploy — 2026-11-03
+
+1. **Admin de teste**: confirmado que existe só 1 usuário ADMIN em produção
+   (`hernani.jorge1@gmail.com`) — o admin de teste cogitado nunca chegou a ser criado
+   (tentativa bloqueada pelo classificador de permissões do assistente).
+2. **CORS do MinIO**: `mc cors set` por bucket não é implementado nesta imagem
+   (`bitnamilegacy/minio:latest`); resolvido via env var `MINIO_API_CORS_ALLOW_ORIGIN`
+   no `ingles-minio`, testado de ponta a ponta com PUT real por URL assinada (preflight
+   204, PUT 200, `ETag` exposto automaticamente).
+3. **Segurança da imagem GHCR**: inspecionada via `.dockerignore`/repo Git +
+   filesystem do container em produção (sem Docker local) — sem `.env`, sem `.git`, sem
+   segredos. Mantida pública.
+
+Detalhes completos em [`docs/DEPLOY.md`](docs/DEPLOY.md) (seções "Admin", "CORS do
+bucket `ingles-videos`", "Segurança da imagem GHCR").
 
 ## Revalidação — 2026-11-01
 

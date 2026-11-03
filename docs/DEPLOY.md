@@ -38,6 +38,27 @@
 
 Criado via `scripts/create-admin.ts` (lê `ADMIN_EMAIL`/`ADMIN_PASSWORD` do ambiente, nunca pede nem registra a senha em lugar nenhum). Rodado localmente pelo próprio usuário, não pelo assistente.
 
+Confirmado em 2026-11-03: existe **exatamente 1** usuário com `role = ADMIN` em produção (o admin real criado pelo usuário). Uma tentativa de criar um segundo admin de teste (só para validar o fluxo de login sem usar a senha real) foi **bloqueada pelo classificador de permissões do assistente** antes de rodar — ou seja, nunca chegou a existir no banco.
+
+## CORS do bucket `ingles-videos`
+
+A imagem `bitnamilegacy/minio:latest` rodando aqui **não implementa `mc cors set` por bucket** (comando existe no client `mc`, mas o servidor recusa qualquer configuração com `"functionality that is not implemented"`, independente do conteúdo do XML). Configurado em vez disso via variável de ambiente do servidor (suporte mais maduro/estável do MinIO, igual de efetivo para este caso de uso de bucket único):
+
+```
+MINIO_API_CORS_ALLOW_ORIGIN=https://nyt-ingles-app.fox7oc.easypanel.host
+```
+
+Testado de ponta a ponta com uma URL assinada real (mesmo código da aplicação): preflight `OPTIONS` retorna `204` com `Access-Control-Allow-Origin`/`Allow-Methods`/`Allow-Headers` corretos, e o `PUT` real retorna `200` com `Access-Control-Allow-Origin` e **`ETag` já incluído automaticamente em `Access-Control-Expose-Headers`** (o MinIO expõe isso por padrão quando CORS está habilitado — não precisou de configuração extra para o multipart funcionar).
+
+## Segurança da imagem GHCR
+
+Sem Docker instalado nesta máquina para rodar `docker history`, a inspeção foi feita de duas formas equivalentes:
+
+1. `.dockerignore` já exclui `.env`/`.env.*.local`/`.git` do contexto de build; e o repositório Git em si nunca teve `.env` commitado (só `.env.example`, com placeholders).
+2. Inspeção direta do filesystem do container **rodando em produção** (exatamente o que foi puxado do GHCR): `find` por `.env*`/`*secret*` em todo o container não encontrou nada fora de `node_modules`, `/app/.git` não existe, e uma busca por padrões de chave Stripe real (`sk_live`, `sk_test_...`, `whsec_...`) nos bundles compilados não encontrou nada.
+
+Imagem confirmada limpa — **mantida pública**, sem necessidade de token/credencial no Easypanel.
+
 ## Bugs reais encontrados e corrigidos durante este primeiro deploy
 
 1. **`next build` quebrava sem `DATABASE_URL`** — `src/lib/prisma.ts` instanciava o client no carregamento do módulo. Corrigido para instanciação lazy (Proxy).
@@ -61,5 +82,4 @@ Criado via `scripts/create-admin.ts` (lê `ADMIN_EMAIL`/`ADMIN_PASSWORD` do ambi
 - **WhatsApp real**: trocar o placeholder pelo número de verdade.
 - **Domínio próprio**: ainda usando o subdomínio gerado pelo Easypanel.
 - **Exercício "fale" (gravação de áudio → upload MinIO)**: não dá pra testar de forma confiável via automação de navegador (exige permissão real de microfone). Precisa de teste manual.
-- **Login do admin real**: testado só indiretamente (criação de admin de teste separado, removida depois); o login com a conta admin real precisa ser conferido pelo usuário.
-- **CORS do bucket MinIO**: não foi configurado explicitamente (o plano original pedia CORS liberado para o domínio do app) — avaliar se é necessário dado que o upload usa URL assinada ao mesmo host público do MinIO.
+- **Login do admin real**: ainda não confirmado pelo usuário (o assistente nunca usa a senha real); CORS do MinIO já validado com teste de PUT real (ver seção acima), então o próximo teste manual pendente é o próprio login + upload de vídeo pelo painel do professor.
